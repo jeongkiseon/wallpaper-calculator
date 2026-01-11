@@ -21,6 +21,13 @@ button.del{background:#ef4444}
 button.ghost{background:#eef2ff;color:#3730a3}
 button.green{background:var(--ok)}
 input,select{padding:8px;border-radius:10px;border:1px solid #cbd5e1;font-size:13px;max-width:220px}
+/* 모바일 입력 가독성 개선 */
+input.roomName{min-width:120px;font-size:14px}
+input.front,input.side,input.height{min-width:90px;font-size:14px}
+@media(max-width:720px){
+  input.roomName{min-width:140px}
+  input.front,input.side,input.height{min-width:100px}
+}
 input[type=number]{max-width:140px}
 input[type=file]{max-width:320px}
 .table-wrap{overflow-x:auto}
@@ -230,7 +237,7 @@ th{background:#f8fafc;font-weight:900}
     <div class="grid3" style="margin-top:10px">
       <label class="row between">
         <span style="font-weight:900">풀(kg) 계수</span>
-        <input id="coefGlue" type="number" step="0.01" value="0.20" />
+        <input id="coefGlue" type="number" step="0.01" value="0.25" />
       </label>
       <label class="row between">
         <span style="font-weight:900">네바리(kg) 계수</span>
@@ -243,7 +250,7 @@ th{background:#f8fafc;font-weight:900}
     </div>
 
     <p class="small" style="margin:8px 0 0">
-      기본값 예시: 풀=면적×0.20kg, 네바리=면적×0.05kg, 부직포=면적×1.00㎡(천장/벽 전체 보강 가정). 필요하면 계수를 바꿔 주세요.
+      기본값 예시: 풀=면적×0.25kg, 네바리=면적×0.05kg, 부직포=면적×1.00㎡(천장/벽 전체 보강 가정). 필요하면 계수를 바꿔 주세요.
     </p>
 
     <div class="grid2" style="margin-top:10px">
@@ -271,10 +278,10 @@ th{background:#f8fafc;font-weight:900}
     </div>
 
     <div class="grid2" style="margin-top:10px">
-      <label class="row between"><span style="font-weight:900">회사명</span><input id="companyName" value="OO인테리어" /></label>
-      <label class="row between"><span style="font-weight:900">담당자</span><input id="managerName" value="홍길동" /></label>
-      <label class="row between"><span style="font-weight:900">연락처</span><input id="companyPhone" value="010-0000-0000" /></label>
-      <label class="row between"><span style="font-weight:900">주소</span><input id="companyAddr" value="서울특별시 …" /></label>
+      <label class="row between"><span style="font-weight:900">회사명</span><input id="companyName" value="집가이버 인테리어" /></label>
+      <label class="row between"><span style="font-weight:900">담당자</span><input id="managerName" value="전광섭" /></label>
+      <label class="row between"><span style="font-weight:900">연락처</span><input id="companyPhone" value="010-5378-7087" /></label>
+      <label class="row between"><span style="font-weight:900">주소</span><input id="companyAddr" value="안양 동안구 시민대로 252" /></label>
       <label class="row between"><span style="font-weight:900">고객명</span><input id="clientName" value="고객" /></label>
       <label class="row between"><span style="font-weight:900">현장주소</span><input id="siteAddr" value="현장 주소" /></label>
       <label class="row between"><span style="font-weight:900">견적일</span><input id="estimateDate" type="date" /></label>
@@ -381,8 +388,8 @@ th{background:#f8fafc;font-weight:900}
 
   // ---- 기본 벽지 데이터(탭) ----
   const wallpaper = {
-    silk:   { name: '실크',   w: 1.06, l: 15.5,  price: 27000 },
-    wide:   { name: '광폭',   w: 0.93, l: 17.75, price: 18600 },
+    silk:   { name: '실크',   w: 1.06, l: 15.5,  price: 40000 },
+    wide:   { name: '광폭',   w: 0.93, l: 17.75, price: 23000 },
     narrow: { name: '소폭',   w: 0.53, l: 12.5,  price:  5000 },
   };
   let current = 'silk';
@@ -399,26 +406,6 @@ th{background:#f8fafc;font-weight:900}
   };
   const ceilDiv = (a, b) => (b > 0 ? Math.ceil(a / b) : 0);
 
-  // ---- 방 행 추가 ----
-  function addRoom({ name = '거실', front = 420, side = 440, height = 230, ceiling = true } = {}) {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td><input class="roomName" value="${escapeHtml(name)}" placeholder="예: 거실" /></td>
-      <td><input class="front" type="number" min="0" step="1" value="${front}" /></td>
-      <td><input class="side" type="number" min="0" step="1" value="${side}" /></td>
-      <td><input class="height" type="number" min="0" step="1" value="${height}" /></td>
-      <td><input class="ceiling" type="checkbox" ${ceiling ? 'checked' : ''} /></td>
-      <td class="no-print"><button type="button" class="del delBtn">삭제</button></td>
-    `;
-
-    tr.querySelectorAll('input').forEach((el) => el.addEventListener('input', calc));
-    tr.querySelector('.delBtn').addEventListener('click', () => { tr.remove(); calc(); });
-
-    tbody().appendChild(tr);
-    applyGlobalCeilingToRow(tr);
-    calc();
-  }
-
   // ---- 전역 천장 ON/OFF ----
   function applyGlobalCeilingToRow(tr) {
     const mode = $('globalCeiling').value;
@@ -430,6 +417,31 @@ th{background:#f8fafc;font-weight:900}
 
   function applyGlobalCeilingToAll() {
     tbody().querySelectorAll('tr').forEach(applyGlobalCeilingToRow);
+    calc();
+  }
+
+  // ---- 방 행 추가 ----
+  function addRoom({ name = '안방', front = 420, side = 440, height = 230, ceiling = true } = {}) {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><input class="roomName" value="${escapeHtml(name)}" placeholder="예: 안방" autocomplete="off" /></td>
+      <td><input class="front" type="number" min="0" step="1" value="${front}" /></td>
+      <td><input class="side" type="number" min="0" step="1" value="${side}" /></td>
+      <td><input class="height" type="number" min="0" step="1" value="${height}" /></td>
+      <td><input class="ceiling" type="checkbox" ${ceiling ? 'checked' : ''} /></td>
+      <td class="no-print"><button type="button" class="del delBtn" style="padding:6px 10px;font-size:12px">삭제</button></td>
+    `;
+
+    tr.querySelectorAll('input').forEach((el) => {
+      // 모바일 한글 입력(IME) 대응: input + change + compositionend
+      el.addEventListener('input', calc);
+      el.addEventListener('change', calc);
+      el.addEventListener('compositionend', calc);
+    });
+    tr.querySelector('.delBtn').addEventListener('click', () => { tr.remove(); calc(); });
+
+    tbody().appendChild(tr);
+    applyGlobalCeilingToRow(tr);
     calc();
   }
 
@@ -476,7 +488,8 @@ th{background:#f8fafc;font-weight:900}
     let prAreaSum = 0, prFrontSum = 0, prSideSum = 0, prCeilSum = 0, prAllSum = 0;
 
     tbody().querySelectorAll('tr').forEach((tr) => {
-      const name = (tr.querySelector('.roomName')?.value || '').trim() || '방';
+      const nameInput = tr.querySelector('.roomName');
+      const name = (nameInput && typeof nameInput.value === 'string' ? nameInput.value : '').trim() || '방';
       const fCm = safeNum(tr.querySelector('.front')?.value, 0);
       const sCm = safeNum(tr.querySelector('.side')?.value, 0);
       const hCm = safeNum(tr.querySelector('.height')?.value, 0);
@@ -562,7 +575,7 @@ th{background:#f8fafc;font-weight:900}
     // print sheet binding
     fillPrint({
       W, L, wpP, lossRate, lossArea, rolls, amount,
-      pr: { rows: prBody.cloneNode(true), areaSum: prAreaSum, frontSum: prFrontSum, sideSum: prSideSum, ceilSum: prCeilSum, allSum: prAllSum },
+      pr: { areaSum: prAreaSum, frontSum: prFrontSum, sideSum: prSideSum, ceilSum: prCeilSum, allSum: prAllSum },
       sundries: { glueKg, nabariKg, nonwovenM2 },
     });
   }
@@ -579,14 +592,10 @@ th{background:#f8fafc;font-weight:900}
 
     $('p_wpinfo').innerText = `벽지: ${wallpaper[current].name} / 폭 ${data.W.toFixed(2)}m / 길이 ${data.L.toFixed(2)}m / 단가 ${data.wpP.toLocaleString()}원 / 손실률 ${(data.lossRate*100).toFixed(0)}%`;
 
-    // rooms
+    // rooms (rebuild from perRoomTable)
     const pRoomBody = $('p_roomBody');
     pRoomBody.innerHTML = '';
-    // rebuild from perRoomTable tbody for reliability
-    document.querySelectorAll('#perRoomTable tbody tr').forEach(tr => {
-      const clone = tr.cloneNode(true);
-      pRoomBody.appendChild(clone);
-    });
+    document.querySelectorAll('#perRoomTable tbody tr').forEach(tr => pRoomBody.appendChild(tr.cloneNode(true)));
 
     $('p_areaSum').innerText = data.pr.areaSum.toFixed(2);
     $('p_frontSum').innerText = String(data.pr.frontSum);
@@ -605,7 +614,6 @@ th{background:#f8fafc;font-weight:900}
 
   // ---- 인쇄 ----
   function printEstimate() {
-    // 인쇄 직전 최신 반영
     calc();
     window.print();
   }
@@ -615,7 +623,7 @@ th{background:#f8fafc;font-weight:900}
     tbody().innerHTML = '';
     setType('silk');
     $('globalCeiling').value = 'follow';
-    addRoom({ name: '거실', front: 420, side: 440, height: 230, ceiling: true });
+    addRoom({ name: '안방', front: 420, side: 440, height: 230, ceiling: true });
   }
 
   // ---- 간단 테스트(콘솔) ----
@@ -624,21 +632,30 @@ th{background:#f8fafc;font-weight:900}
     console.assert(typeof calc === 'function', 'calc should be a function');
     console.assert(typeof setType === 'function', 'setType should be a function');
 
+    // (A) 빈 테이블 계산
     tbody().innerHTML = '';
     $('wpWidth').value = 1.06; $('wpLength').value = 15.5; $('wpPrice').value = 27000;
     $('loss').value = 10;
     calc();
     console.assert($('totalArea').innerText === '0.00', 'totalArea should be 0.00 when no rooms');
 
-    addRoom({ name: 'T', front: 420, side: 440, height: 230, ceiling: true });
+    // (B) 방 1개 추가 후 면적 양수
+    addRoom({ name: '안방', front: 420, side: 440, height: 230, ceiling: true });
     const ta = Number($('totalArea').innerText);
     console.assert(Number.isFinite(ta) && ta > 0, 'totalArea should be positive after adding a room');
 
-    // global ceiling OFF test
+    // (C) global ceiling OFF 적용
     $('globalCeiling').value = 'off';
     applyGlobalCeilingToAll();
     const anyCeil = [...tbody().querySelectorAll('.ceiling')].some(cb => cb.checked);
     console.assert(anyCeil === false, 'global ceiling off should uncheck all');
+
+    // (D) 방별 표 행 수가 방 개수와 일치
+    $('globalCeiling').value = 'follow';
+    calc();
+    const roomCount = tbody().querySelectorAll('tr').length;
+    const perRoomCount = document.querySelectorAll('#perRoomTable tbody tr').length;
+    console.assert(roomCount === perRoomCount, 'perRoomTable rows should match room rows');
   }
 
   // ---- HTML escape ----
@@ -663,7 +680,6 @@ th{background:#f8fafc;font-weight:900}
 
   // ---- 초기 바인딩 ----
   document.addEventListener('DOMContentLoaded', () => {
-    // date default
     $('estimateDate').value = new Date().toISOString().slice(0,10);
 
     $('btnAddRoom').addEventListener('click', () => addRoom());
@@ -688,12 +704,12 @@ th{background:#f8fafc;font-weight:900}
     });
 
     setType('silk');
-    // default logo placeholder
     $('logoPreview').src = '';
 
-    addRoom({ name: '거실', front: 420, side: 440, height: 230, ceiling: true });
+    // 기본 예시 방 3개
+    addRoom({ name: '안방', front: 420, side: 440, height: 230, ceiling: true });
     addRoom({ name: '안방', front: 360, side: 420, height: 230, ceiling: true });
-    addRoom({ name: '작은방', front: 300, side: 360, height: 230, ceiling: false });
+    addRoom({ name: '작은방', front: 300, side: 360, height: 230, ceiling: true });
 
     runTests();
     calc();
