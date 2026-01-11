@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>도배 면적 계산기 (방별 · 벽지종류 · 부자재 · 견적서)</title>
+<title>방별 도배 계산기 (방별 · 벽지종류)</title>
 <style>
-:root{--main:#667eea;--sub:#764ba2;--ink:#0f172a;--muted:#64748b;--card:#ffffff;--line:#e5e7eb;--ok:#10b981;--warn:#f59e0b;}
+:root{--main:#667eea;--sub:#764ba2;--ink:#0f172a;--muted:#64748b;--card:#ffffff;--line:#e5e7eb;--ok:#10b981;}
 *{box-sizing:border-box}
 body{margin:0;font-family:'Noto Sans KR','Malgun Gothic',system-ui,-apple-system,Segoe UI,Roboto,Arial; background:linear-gradient(135deg,var(--main),var(--sub)); color:var(--ink);}
 .container{max-width:1180px;margin:0 auto;padding:12px}
@@ -19,9 +19,7 @@ button{border:none;border-radius:10px;padding:10px 14px;font-weight:900;backgrou
 button:active{transform:translateY(1px)}
 button.del{background:#ef4444}
 button.ghost{background:#eef2ff;color:#3730a3}
-button.green{background:var(--ok)}
 input,select{padding:8px;border-radius:10px;border:1px solid #cbd5e1;font-size:13px;max-width:220px}
-/* 모바일 입력 가독성 개선 */
 input.roomName{min-width:120px;font-size:14px}
 input.front,input.side,input.height{min-width:90px;font-size:14px}
 @media(max-width:720px){
@@ -29,11 +27,8 @@ input.front,input.side,input.height{min-width:90px;font-size:14px}
   input.front,input.side,input.height{min-width:100px}
 }
 input[type=number]{max-width:140px}
-input[type=file]{max-width:320px}
 .table-wrap{overflow-x:auto}
 hr{border:0;border-top:1px solid var(--line);margin:12px 0}
-
-/* tables */
 table{width:100%;border-collapse:collapse;font-size:13px}
 th,td{border-bottom:1px solid var(--line);padding:10px 8px;text-align:center;vertical-align:middle}
 th{background:#f8fafc;font-weight:900}
@@ -42,13 +37,9 @@ th{background:#f8fafc;font-weight:900}
 .total{font-weight:900;color:#4338ca}
 .small{font-size:12px;color:var(--muted)}
 .badge{display:inline-block;padding:3px 10px;border-radius:999px;background:#eef2ff;color:#3730a3;font-size:12px;font-weight:900}
-
-/* tabs */
 .tabs{display:flex;gap:6px;margin:10px 0}
 .tab{flex:1;padding:10px;border-radius:12px;background:#e5e7eb;text-align:center;font-weight:900;cursor:pointer;user-select:none}
 .tab.active{background:var(--main);color:#fff}
-
-/* layout */
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
 @media(max-width:920px){.grid3{grid-template-columns:1fr}}
@@ -58,44 +49,18 @@ th{background:#f8fafc;font-weight:900}
   input,select{width:100%;max-width:100%}
   table{font-size:12px}
 }
-
-/* print */
-@media print{
-  body{background:#fff}
-  .no-print{display:none !important}
-  #printSheet{display:block !important}
-  .card{box-shadow:none;border:1px solid #e5e7eb}
-}
-
-/* A4 견적서 */
-#printSheet{display:none}
-.a4{width:210mm;min-height:297mm;margin:0 auto;background:#fff;color:#111;}
-.a4 .pad{padding:14mm}
-.a4 h2{margin:0;font-size:18px}
-.a4 .muted{color:#444;font-size:11px}
-.a4 .top{display:flex;gap:12mm;align-items:center;justify-content:space-between}
-.logoBox{display:flex;gap:10px;align-items:center}
-.logoImg{width:42mm;height:16mm;object-fit:contain;border:1px dashed #cbd5e1;border-radius:6px;padding:4px}
-.a4 .kv{display:grid;grid-template-columns:38mm 1fr 38mm 1fr;gap:6px 10px;margin-top:8mm;font-size:11px}
-.a4 .kv div{border:1px solid #e5e7eb;padding:6px;border-radius:6px}
-.a4 .kv .k{font-weight:900;background:#f8fafc}
-.a4 table{font-size:11px}
-.a4 th,.a4 td{padding:6px 6px}
-.a4 .section{margin-top:8mm}
-.a4 .sign{display:flex;justify-content:flex-end;margin-top:10mm;font-size:11px}
-.a4 .footer{margin-top:8mm;border-top:1px solid #e5e7eb;padding-top:6mm;font-size:10.5px;color:#333;line-height:1.45}
 </style>
 </head>
 <body>
 <div class="container">
   <header>
     <h1>🏠 방별 도배 계산기</h1>
-    <p>방별 장수표 · 천장 ON/OFF · 부자재(풀/네바리/부직포) · A4 견적서(로고) 출력</p>
+    <p>방별 장수표 · 천장 ON/OFF · 벽지종류(실크/광폭/소폭) · 손실률 반영</p>
   </header>
 
   <!-- 1) 방 입력 -->
   <div class="card">
-    <div class="row between no-print">
+    <div class="row between">
       <div class="row">
         <button id="btnAddRoom" type="button">➕ 방 추가</button>
         <button id="btnClear" type="button" class="ghost">초기화</button>
@@ -122,7 +87,7 @@ th{background:#f8fafc;font-weight:900}
             <th>벽 좌/우 (cm)</th>
             <th>높이 (cm)</th>
             <th>천장 포함</th>
-            <th class="no-print">삭제</th>
+            <th>삭제</th>
           </tr>
         </thead>
         <tbody></tbody>
@@ -141,7 +106,7 @@ th{background:#f8fafc;font-weight:900}
       <span id="rollArea" class="total">-</span>
     </div>
 
-    <div class="tabs no-print" role="tablist" aria-label="wallpaper tabs">
+    <div class="tabs" role="tablist" aria-label="wallpaper tabs">
       <div class="tab active" data-type="silk" role="tab" aria-selected="true">실크</div>
       <div class="tab" data-type="wide" role="tab" aria-selected="false">광폭</div>
       <div class="tab" data-type="narrow" role="tab" aria-selected="false">소폭</div>
@@ -163,18 +128,49 @@ th{background:#f8fafc;font-weight:900}
     </div>
 
     <p id="typeInfo" class="small" style="margin:10px 0 0"></p>
+  
+  <!-- 2️⃣ 방별 비용표 -->
+  <div class="card">
+    <h3 style="margin:0 0 10px 0">1️⃣ 방별 비용표 (선택된 벽지 기준)</h3>
+    <div class="table-wrap">
+      <table id="costTable">
+        <thead>
+          <tr>
+            <th>구분</th>
+            <th>원가(벽지)</th>
+            <th>인건비</th>
+            <th>부재료비(10%)</th>
+            <th>합계</th><th>최종금액<br/>(만원단위)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td id="costType">-</td>
+            <td id="matCost">0</td>
+            <td><input id="laborCostInput" type="number" min="0" step="10000" value="0" style="width:120px;text-align:right" /></td>
+            <td id="subCost">0</td>
+            <td id="totalCost">0</td>
+			<td id="finalCost">0</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="small" style="margin-top:8px">
+      인건비 기준: 자동 계산되며, 필요 시 직접 수정 가능 (만원 단위 권장)<br/>
+      부재료비 = (원가 + 인건비) × 10%
+    </p>
   </div>
+</div>
 
   <!-- 3) 결과 + 방별 장수 표 -->
   <div class="card" id="estimate">
     <div class="row between">
       <h3 style="margin:0">📐 계산 결과</h3>
-      <div class="row no-print">
+      <div class="row">
         <label class="row" style="gap:8px">
           <span style="font-weight:900">손실률(%)</span>
           <input id="loss" type="number" value="10" min="0" max="50" step="1" />
         </label>
-        <button id="btnPrint" type="button">📄 A4 견적서 출력</button>
       </div>
     </div>
 
@@ -197,7 +193,7 @@ th{background:#f8fafc;font-weight:900}
     <hr />
 
     <div class="row between">
-      <b>1️⃣ 방별 장수 표</b>
+      <b>2️⃣ 방별 장수 표</b>
       <span class="small">방별 올림 합산(실무형)</span>
     </div>
     <div class="table-wrap" style="margin-top:8px">
@@ -210,6 +206,7 @@ th{background:#f8fafc;font-weight:900}
             <th>좌우 장수</th>
             <th>천장 장수</th>
             <th>합계</th>
+			<th>최종</th>
           </tr>
         </thead>
         <tbody></tbody>
@@ -226,159 +223,9 @@ th{background:#f8fafc;font-weight:900}
       </table>
     </div>
 
-    <hr />
-
-    <!-- 3) 부자재 자동 산출 -->
-    <div class="row between">
-      <b>3️⃣ 부자재 자동 산출</b>
-      <span class="small">계수는 현장/브랜드마다 다르므로 수정 가능</span>
-    </div>
-
-    <div class="grid3" style="margin-top:10px">
-      <label class="row between">
-        <span style="font-weight:900">풀(kg) 계수</span>
-        <input id="coefGlue" type="number" step="0.01" value="0.25" />
-      </label>
-      <label class="row between">
-        <span style="font-weight:900">네바리(kg) 계수</span>
-        <input id="coefNabari" type="number" step="0.01" value="0.05" />
-      </label>
-      <label class="row between">
-        <span style="font-weight:900">부직포(㎡) 계수</span>
-        <input id="coefNonwoven" type="number" step="0.01" value="1.00" />
-      </label>
-    </div>
-
-    <p class="small" style="margin:8px 0 0">
-      기본값 예시: 풀=면적×0.25kg, 네바리=면적×0.05kg, 부직포=면적×1.00㎡(천장/벽 전체 보강 가정). 필요하면 계수를 바꿔 주세요.
-    </p>
-
-    <div class="grid2" style="margin-top:10px">
-      <table style="min-width:0">
-        <tr><td class="tleft">풀(kg)</td><td id="glueKg" class="total tright">0</td></tr>
-        <tr><td class="tleft">네바리(kg)</td><td id="nabariKg" class="total tright">0</td></tr>
-        <tr><td class="tleft">부직포(㎡)</td><td id="nonwovenM2" class="total tright">0</td></tr>
-      </table>
-      <table style="min-width:0">
-        <tr><td class="tleft">부직포 롤 환산(옵션)</td><td class="tright"><span class="small">(폭 1m × 길이 25m 기준)</span></td></tr>
-        <tr><td class="tleft">부직포 롤 수</td><td id="nonwovenRolls" class="total tright">0</td></tr>
-      </table>
-    </div>
-
     <p class="small" style="margin:10px 0 0">
       장수 산정(요약): 앞뒤=ceil((앞뒤길이×2)/벽지폭), 좌우=ceil((좌우길이×2)/벽지폭), 천장=ceil(앞뒤길이/벽지폭). 천장 방향 기준은 현장 결 방향에 따라 달라질 수 있습니다.
     </p>
-  </div>
-
-  <!-- 4) 견적서 디자인 입력(로고/회사정보) -->
-  <div class="card no-print">
-    <div class="row between">
-      <b>4️⃣ 견적서 양식 설정 </b>
-      <span class="small">출력 시 A4 견적서에 반영</span>
-    </div>
-
-    <div class="grid2" style="margin-top:10px">
-      <label class="row between"><span style="font-weight:900">회사명</span><input id="companyName" value="집가이버 인테리어" /></label>
-      <label class="row between"><span style="font-weight:900">담당자</span><input id="managerName" value="전광섭" /></label>
-      <label class="row between"><span style="font-weight:900">연락처</span><input id="companyPhone" value="010-5378-7087" /></label>
-      <label class="row between"><span style="font-weight:900">주소</span><input id="companyAddr" value="안양 동안구 시민대로 252" /></label>
-      <label class="row between"><span style="font-weight:900">고객명</span><input id="clientName" value="고객" /></label>
-      <label class="row between"><span style="font-weight:900">현장주소</span><input id="siteAddr" value="현장 주소" /></label>
-      <label class="row between"><span style="font-weight:900">견적일</span><input id="estimateDate" type="date" /></label>
-      <label class="row between"><span style="font-weight:900">로고 이미지</span><input id="logoFile" type="file" accept="image/*" /></label>
-    </div>
-
-    <p class="small" style="margin:10px 0 0">
-      로고 파일을 선택하면 인쇄(A4) 시 상단에 표시됩니다.
-    </p>
-  </div>
-
-  <!-- PRINT SHEET (A4) -->
-  <div id="printSheet" class="a4">
-    <div class="pad">
-      <div class="top">
-        <div class="logoBox">
-          <img id="logoPreview" class="logoImg" alt="Logo" />
-          <div>
-            <h2 id="p_company">OO인테리어</h2>
-            <div class="muted" id="p_contact">연락처: 010-0000-0000 · 주소: 서울특별시 …</div>
-          </div>
-        </div>
-        <div style="text-align:right">
-          <div style="font-weight:900;font-size:16px">도배 견적서</div>
-          <div class="muted" id="p_date">견적일: -</div>
-        </div>
-      </div>
-
-      <div class="kv">
-        <div class="k">고객명</div><div id="p_client">-</div>
-        <div class="k">담당자</div><div id="p_manager">-</div>
-        <div class="k">현장주소</div><div id="p_site" style="grid-column: span 3">-</div>
-      </div>
-
-      <div class="section">
-        <div style="display:flex;justify-content:space-between;align-items:flex-end">
-          <div style="font-weight:900">① 방별 내역</div>
-          <div class="muted" id="p_wpinfo">-</div>
-        </div>
-        <table style="margin-top:6px">
-          <thead>
-            <tr>
-              <th>방</th><th>면적(㎡)</th><th>앞뒤</th><th>좌우</th><th>천장</th><th>장수합계</th>
-            </tr>
-          </thead>
-          <tbody id="p_roomBody"></tbody>
-          <tfoot>
-            <tr>
-              <th class="tleft">합계</th>
-              <th id="p_areaSum">0</th>
-              <th id="p_frontSum">0</th>
-              <th id="p_sideSum">0</th>
-              <th id="p_ceilSum">0</th>
-              <th id="p_allSum">0</th>
-            </tr>
-          </tfoot>
-        </table>
-      </div>
-
-      <div class="section">
-        <div style="display:flex;justify-content:space-between;align-items:flex-end">
-          <div style="font-weight:900">② 자재 및 금액</div>
-          <div class="muted">손실률 반영 면적 기준</div>
-        </div>
-        <table style="margin-top:6px">
-          <tbody>
-            <tr><td class="tleft">손실 포함 면적(㎡)</td><td class="tright" id="p_lossArea">0</td></tr>
-            <tr><td class="tleft">벽지 롤수(올림)</td><td class="tright" id="p_rolls">0</td></tr>
-            <tr><td class="tleft">벽지 금액(원)</td><td class="tright" id="p_amount">0</td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="section">
-        <div style="font-weight:900">③ 부자재 산출</div>
-        <table style="margin-top:6px">
-          <tbody>
-            <tr><td class="tleft">풀(kg)</td><td class="tright" id="p_glue">0</td></tr>
-            <tr><td class="tleft">네바리(kg)</td><td class="tright" id="p_nabari">0</td></tr>
-            <tr><td class="tleft">부직포(㎡)</td><td class="tright" id="p_nonwoven">0</td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="sign">
-        <div style="text-align:right">
-          <div class="muted">(서명) ________________________</div>
-        </div>
-      </div>
-
-      <div class="footer">
-        <div><b>안내</b></div>
-        <div>• 본 견적은 현장 상태(벽면 손상, 곰팡이, 퍼티/샌딩 필요 여부, 패턴 매칭 등)에 따라 변동될 수 있습니다.</div>
-        <div>• 천장 도배는 방향(결) 및 조명/몰딩 조건에 따라 장수 산정이 달라질 수 있습니다.</div>
-        <div>• 부자재 산출은 입력 계수 기반의 참고치입니다.</div>
-      </div>
-    </div>
   </div>
 </div>
 
@@ -414,14 +261,13 @@ th{background:#f8fafc;font-weight:900}
     if (mode === 'on') cb.checked = true;
     if (mode === 'off') cb.checked = false;
   }
-
   function applyGlobalCeilingToAll() {
     tbody().querySelectorAll('tr').forEach(applyGlobalCeilingToRow);
     calc();
   }
 
   // ---- 방 행 추가 ----
-  function addRoom({ name = '안방', front = 420, side = 440, height = 230, ceiling = true } = {}) {
+  function addRoom({ name = '방', front = 420, side = 440, height = 230, ceiling = true } = {}) {
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td><input class="roomName" value="${escapeHtml(name)}" placeholder="예: 안방" autocomplete="off" /></td>
@@ -429,17 +275,14 @@ th{background:#f8fafc;font-weight:900}
       <td><input class="side" type="number" min="0" step="1" value="${side}" /></td>
       <td><input class="height" type="number" min="0" step="1" value="${height}" /></td>
       <td><input class="ceiling" type="checkbox" ${ceiling ? 'checked' : ''} /></td>
-      <td class="no-print"><button type="button" class="del delBtn" style="padding:6px 10px;font-size:12px">삭제</button></td>
+      <td><button type="button" class="del delBtn" style="padding:6px 10px;font-size:12px">삭제</button></td>
     `;
-
     tr.querySelectorAll('input').forEach((el) => {
-      // 모바일 한글 입력(IME) 대응: input + change + compositionend
       el.addEventListener('input', calc);
       el.addEventListener('change', calc);
-      el.addEventListener('compositionend', calc);
+      el.addEventListener('compositionend', calc); // 모바일 IME 대응
     });
     tr.querySelector('.delBtn').addEventListener('click', () => { tr.remove(); calc(); });
-
     tbody().appendChild(tr);
     applyGlobalCeilingToRow(tr);
     calc();
@@ -473,15 +316,14 @@ th{background:#f8fafc;font-weight:900}
     const L = wpL > 0 ? wpL : 0;
     const rollArea = W * L;
 
-    const lossRate = safeNum($('loss').value, 10) / 100;
+    const lossRate = Math.max(0, safeNum($('loss').value, 10)) / 100;
 
-    // totals
     let totalArea = 0;
     let frontSheets = 0;
     let sideSheets = 0;
     let ceilSheets = 0;
 
-    // per room rows
+    // per room table reset
     const prBody = $('perRoomTable').querySelector('tbody');
     prBody.innerHTML = '';
 
@@ -533,11 +375,10 @@ th{background:#f8fafc;font-weight:900}
       prBody.appendChild(row);
     });
 
-    const lossArea = totalArea * (1 + Math.max(0, lossRate));
+    const lossArea = totalArea * (1 + lossRate);
     const rolls = rollArea > 0 ? Math.ceil(lossArea / rollArea) : 0;
     const amount = rolls * wpP;
 
-    // UI
     $('rollArea').innerText = rollArea > 0 ? `1롤 면적: ${rollArea.toFixed(2)}㎡` : '1롤 면적: -';
     $('typeInfo').innerText = `선택: ${wallpaper[current].name} · 설정: 폭 ${W.toFixed(2)}m / 길이 ${L.toFixed(2)}m / 단가 ${wpP.toLocaleString()}원`;
 
@@ -557,65 +398,55 @@ th{background:#f8fafc;font-weight:900}
     $('perRoomCeilSum').innerText = String(prCeilSum);
     $('perRoomAllSum').innerText = String(prAllSum);
 
-    // sundries
-    const coefGlue = Math.max(0, safeNum($('coefGlue').value, 0.20));
-    const coefNabari = Math.max(0, safeNum($('coefNabari').value, 0.05));
-    const coefNonwoven = Math.max(0, safeNum($('coefNonwoven').value, 1.00));
 
-    const glueKg = lossArea * coefGlue;
-    const nabariKg = lossArea * coefNabari;
-    const nonwovenM2 = lossArea * coefNonwoven;
-    const nonwovenRolls = Math.ceil(nonwovenM2 / 25); // 1m×25m 가정
+    // ---- 비용 계산 (방별 비용표) ----
+    const roomCount = tbody().querySelectorAll('tr').length;
 
-    $('glueKg').innerText = glueKg.toFixed(2);
-    $('nabariKg').innerText = nabariKg.toFixed(2);
-    $('nonwovenM2').innerText = nonwovenM2.toFixed(2);
-    $('nonwovenRolls').innerText = String(nonwovenRolls);
+    let laborBase = 0;
+    if (current === 'narrow') laborBase = 100000;
+    if (current === 'wide')   laborBase = 110000;
+    if (current === 'silk')   laborBase = 130000;
 
-    // print sheet binding
-    fillPrint({
-      W, L, wpP, lossRate, lossArea, rolls, amount,
-      pr: { areaSum: prAreaSum, frontSum: prFrontSum, sideSum: prSideSum, ceilSum: prCeilSum, allSum: prAllSum },
-      sundries: { glueKg, nabariKg, nonwovenM2 },
-    });
-  }
+    const autoLabor = roomCount > 0 ? laborBase + (roomCount - 1) * 100000 : 0;
 
-  function fillPrint(data) {
-    $('p_company').innerText = $('companyName').value || '회사명';
-    $('p_contact').innerText = `연락처: ${$('companyPhone').value || '-'} · 주소: ${$('companyAddr').value || '-'}`;
-    $('p_client').innerText = $('clientName').value || '-';
-    $('p_manager').innerText = $('managerName').value || '-';
-    $('p_site').innerText = $('siteAddr').value || '-';
+    const laborInput = document.getElementById('laborCostInput');
 
-    const d = $('estimateDate').value ? $('estimateDate').value : new Date().toISOString().slice(0,10);
-    $('p_date').innerText = `견적일: ${d}`;
+    // 기준 키 (벽지종류 + 방개수)
+    const laborKey = current + '_' + roomCount;
 
-    $('p_wpinfo').innerText = `벽지: ${wallpaper[current].name} / 폭 ${data.W.toFixed(2)}m / 길이 ${data.L.toFixed(2)}m / 단가 ${data.wpP.toLocaleString()}원 / 손실률 ${(data.lossRate*100).toFixed(0)}%`;
+    if (laborInput) {
+      // 조건이 바뀌면 자동 인건비로 다시 세팅
+      if (laborInput.dataset.key !== laborKey) {
+        laborInput.value = autoLabor;
+        laborInput.dataset.key = laborKey;
+      }
+    }
 
-    // rooms (rebuild from perRoomTable)
-    const pRoomBody = $('p_roomBody');
-    pRoomBody.innerHTML = '';
-    document.querySelectorAll('#perRoomTable tbody tr').forEach(tr => pRoomBody.appendChild(tr.cloneNode(true)));
+    // 사용자가 수정한 값은 같은 조건 내에서는 유지
+    const laborCost = laborInput && laborInput.value !== ''
+      ? Number(laborInput.value)
+      : autoLabor;
 
-    $('p_areaSum').innerText = data.pr.areaSum.toFixed(2);
-    $('p_frontSum').innerText = String(data.pr.frontSum);
-    $('p_sideSum').innerText = String(data.pr.sideSum);
-    $('p_ceilSum').innerText = String(data.pr.ceilSum);
-    $('p_allSum').innerText = String(data.pr.allSum);
+    const matCost = rolls * wpP;
+    const subCost = Math.round((matCost + laborCost) * 0.10);
+    const totalCost = matCost + laborCost + subCost;
 
-    $('p_lossArea').innerText = data.lossArea.toFixed(2);
-    $('p_rolls').innerText = String(data.rolls);
-    $('p_amount').innerText = data.amount.toLocaleString();
+    // 엑셀 ROUND(SUM, -4) : 만원 단위 반올림
+    const finalCost = Math.round(totalCost / 10000) * 10000;
 
-    $('p_glue').innerText = data.sundries.glueKg.toFixed(2);
-    $('p_nabari').innerText = data.sundries.nabariKg.toFixed(2);
-    $('p_nonwoven').innerText = data.sundries.nonwovenM2.toFixed(2);
-  }
 
-  // ---- 인쇄 ----
-  function printEstimate() {
-    calc();
-    window.print();
+
+
+
+    const typeName = wallpaper[current].name + " 합지";
+
+    const setText = (id, val) => document.getElementById(id).innerText = val;
+
+    setText('costType', typeName);
+    setText('matCost', matCost.toLocaleString());
+    setText('subCost', subCost.toLocaleString());
+    setText('totalCost', totalCost.toLocaleString());
+    setText('finalCost', finalCost.toLocaleString());
   }
 
   // ---- 초기화 ----
@@ -624,38 +455,6 @@ th{background:#f8fafc;font-weight:900}
     setType('silk');
     $('globalCeiling').value = 'follow';
     addRoom({ name: '안방', front: 420, side: 440, height: 230, ceiling: true });
-  }
-
-  // ---- 간단 테스트(콘솔) ----
-  function runTests() {
-    console.assert(typeof addRoom === 'function', 'addRoom should be a function');
-    console.assert(typeof calc === 'function', 'calc should be a function');
-    console.assert(typeof setType === 'function', 'setType should be a function');
-
-    // (A) 빈 테이블 계산
-    tbody().innerHTML = '';
-    $('wpWidth').value = 1.06; $('wpLength').value = 15.5; $('wpPrice').value = 27000;
-    $('loss').value = 10;
-    calc();
-    console.assert($('totalArea').innerText === '0.00', 'totalArea should be 0.00 when no rooms');
-
-    // (B) 방 1개 추가 후 면적 양수
-    addRoom({ name: '안방', front: 420, side: 440, height: 230, ceiling: true });
-    const ta = Number($('totalArea').innerText);
-    console.assert(Number.isFinite(ta) && ta > 0, 'totalArea should be positive after adding a room');
-
-    // (C) global ceiling OFF 적용
-    $('globalCeiling').value = 'off';
-    applyGlobalCeilingToAll();
-    const anyCeil = [...tbody().querySelectorAll('.ceiling')].some(cb => cb.checked);
-    console.assert(anyCeil === false, 'global ceiling off should uncheck all');
-
-    // (D) 방별 표 행 수가 방 개수와 일치
-    $('globalCeiling').value = 'follow';
-    calc();
-    const roomCount = tbody().querySelectorAll('tr').length;
-    const perRoomCount = document.querySelectorAll('#perRoomTable tbody tr').length;
-    console.assert(roomCount === perRoomCount, 'perRoomTable rows should match room rows');
   }
 
   // ---- HTML escape ----
@@ -668,54 +467,38 @@ th{background:#f8fafc;font-weight:900}
       .replaceAll("'",'&#39;');
   }
 
-  // ---- 로고 로드 ----
-  function setLogoFromFile(file) {
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      $('logoPreview').src = String(reader.result);
-    };
-    reader.readAsDataURL(file);
-  }
-
   // ---- 초기 바인딩 ----
   document.addEventListener('DOMContentLoaded', () => {
-    $('estimateDate').value = new Date().toISOString().slice(0,10);
-
     $('btnAddRoom').addEventListener('click', () => addRoom());
     $('btnClear').addEventListener('click', clearAll);
-    $('btnPrint').addEventListener('click', printEstimate);
-
     $('globalCeiling').addEventListener('change', applyGlobalCeilingToAll);
+
+    const laborInput = document.getElementById('laborCostInput');
+    if (laborInput) {
+      laborInput.addEventListener('input', calc);
+      laborInput.addEventListener('change', calc);
+    }
 
     document.querySelectorAll('.tab').forEach((t) => {
       t.addEventListener('click', () => setType(t.dataset.type));
     });
 
-    ['wpWidth','wpLength','wpPrice','loss','coefGlue','coefNabari','coefNonwoven',
-     'companyName','managerName','companyPhone','companyAddr','clientName','siteAddr','estimateDate'
-    ].forEach((id) => {
+    ['wpWidth','wpLength','wpPrice','loss'].forEach((id) => {
       $(id).addEventListener('input', calc);
-    });
-
-    $('logoFile').addEventListener('change', (e) => {
-      const file = e.target.files?.[0];
-      setLogoFromFile(file);
+      $(id).addEventListener('change', calc);
     });
 
     setType('silk');
-    $('logoPreview').src = '';
 
     // 기본 예시 방 3개
     addRoom({ name: '안방', front: 420, side: 440, height: 230, ceiling: true });
-    addRoom({ name: '안방', front: 360, side: 420, height: 230, ceiling: true });
+    addRoom({ name: '거실', front: 500, side: 360, height: 240, ceiling: true });
     addRoom({ name: '작은방', front: 300, side: 360, height: 230, ceiling: true });
 
-    runTests();
     calc();
   });
 
-  // expose
+  // expose (optional)
   window.addRoom = addRoom;
   window.calc = calc;
   window.setType = setType;
